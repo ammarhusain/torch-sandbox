@@ -28,6 +28,9 @@ class MITSceneParsingLoader(data.Dataset):
 
     self.files = glob.glob(self.images_path + "/*.jpg")
     
+    # AH cut down to 512 files
+    self.files = self.files[0:512]
+    
     if not self.files:
       raise Exception("No files for split=[%s] found in %s" % (split, self.images_path))
       
@@ -39,21 +42,23 @@ class MITSceneParsingLoader(data.Dataset):
   
   def __getitem__(self, index):
     img = Image.open(self.files[index])
+    # AH tmp resize
+    img = img.resize(self.img_size)
     # convert to numpy array
     img = np.array(img,dtype=np.uint8)
     
     annt_path = os.path.join(self.annotations_path, os.path.basename(self.files[index])[:-4] + ".png")
-    print(annt_path)
     annt = Image.open(annt_path)
+    # AH tmp resize
+    annt = annt.resize(self.img_size)
     annt = np.array(annt,dtype=np.uint8)
-    
+
     if self.augmentations is not None:
       img, annt = self.augmentations(img, annt)
       
     if self.is_transform:
       img, annt = self.transform(img, annt)
-      
-    return img, annt
+    return img, 
   
   def transform(self, img, annt):
     """
