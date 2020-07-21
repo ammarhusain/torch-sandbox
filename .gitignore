@@ -3,3 +3,6 @@
 .ipynb_checkpoints
 nlp/bentrevett-tuts/models/
 vision/semantic-segmentation/data_loader/data/
+*__pycache__*
+__pycache__/
+*.pyc

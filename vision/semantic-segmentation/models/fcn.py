@@ -69,9 +69,9 @@ class FCN32s(nn.Module):
   def forward(self, x):
     conv1 = self.conv_block_1(x)
     conv2 = self.conv_block_2(conv1)
-    conv3 = self.conv_block_2(conv2)
-    conv4 = self.conv_block_2(conv3)
-    conv5 = self.conv_block_2(conv4)
+    conv3 = self.conv_block_3(conv2)
+    conv4 = self.conv_block_4(conv3)
+    conv5 = self.conv_block_5(conv4)
     
     score = self.classifier(conv5)
     
