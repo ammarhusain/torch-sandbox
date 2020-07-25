@@ -7,5 +7,5 @@ class CrossEntropy2d(nn.Module):
     self.dim = dim
     self.criterion = nn.NLLLoss()
   def forward(self, input, target):
-    return self.criterion(F.log_softmax(input, dim=self.dim), target)
+    return -1 * self.criterion(F.log_softmax(input, dim=self.dim), target)
   
