@@ -55,3 +55,20 @@ class AverageComp:
     self.sum += val * n
     self.count += n
     self.avg = self.sum / self.count
+    
+    
+def EncodeColor(labelmap, colors, mode='RGB'):
+    labelmap = labelmap.astype('int')
+    labelmap_rgb = np.zeros((labelmap.shape[0], labelmap.shape[1], 3),
+                            dtype=np.uint8)
+    for label in np.unique(labelmap):
+        if label < 0:
+            continue
+        labelmap_rgb += (labelmap == label)[:, :, np.newaxis] * \
+            np.tile(colors[label],
+                    (labelmap.shape[0], labelmap.shape[1], 1))
+
+    if mode == 'BGR':
+        return labelmap_rgb[:, :, ::-1]
+    else:
+        return labelmap_rgb

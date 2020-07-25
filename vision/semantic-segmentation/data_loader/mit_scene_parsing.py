@@ -50,19 +50,7 @@ class MITSceneParsingLoader(data.Dataset):
     if self.augmentations is not None:
       img, annt = self.augmentations(img, annt)    
     
-    ## Transform image to standard size, mean substraction & normalize.
-    img = img.resize(self.img_size)
-    # convert to numpy array
-    img = np.array(img,dtype=np.float64)
-    # reverse channels: RGB -> BGR
-    if len(img.shape) != 3:
-      print(f"YELLL i {index} ... {img.shape}")
-    img = img[:,:,::-1]
-    img -= self.img_mean
-    img = img/ 255.0
-    # Reshape to get channels as dim=1 of batched tensor since that is what Conv2d Pytorch needs.
-    # (N)HWC -> (N)CHW
-    img = img.transpose(2,0,1)
+    img_t = self.preprocess_image(img)
     
     ## Tranform annotations
     annt_orig_np = np.array(annt, dtype=np.uint8)
@@ -76,10 +64,35 @@ class MITSceneParsingLoader(data.Dataset):
     if not np.all(np.unique(annt_down_np) < self.n_classes):
       raise ValueError("Segmentation map contained invalid class values")
 
-    img_t = torch.from_numpy(img).float()
     annt_t = torch.from_numpy(annt_down_np).long()
 
     return img_t, annt_t
+  
+  
+  def preprocess_image(self, img):
+    ## Transform image to standard size, mean substraction & normalize.
+    img = img.resize(self.img_size)
+    # convert to numpy array
+    img = np.array(img,dtype=np.float64)
+    # reverse channels: RGB -> BGR
+    img = img[:,:,::-1]
+    img -= self.img_mean
+    img = img/ 255.0
+    # Reshape to get channels as dim=1 of batched tensor since that is what Conv2d Pytorch needs.
+    # (N)HWC -> (N)CHW
+    img = img.transpose(2,0,1)
+    return torch.from_numpy(img).float()
+  
+  
+  def get_images(self):
+    """
+    Generator function that transforms & normalizes the images to
+    feed into the model.
+    """
+    for file in self.files: 
+      img = Image.open(file).convert("RGB")
+      img_t = self.preprocess_image(img)
+      yield img_t, file
   
   def transform(self, img, annt):
     """
