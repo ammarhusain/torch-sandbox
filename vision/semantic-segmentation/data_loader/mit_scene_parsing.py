@@ -15,6 +15,7 @@ class MITSceneParsingLoader(data.Dataset):
     This class can also be extended to load data for places challenge:
     https://github.com/CSAILVision/placeschallenge/tree/master/sceneparsing
   """
+  package_path = os.path.dirname(os.path.abspath(__file__))
   def __init__(self, split="training", is_transform=False,
               img_size=(512,512), augmentations=None):
     self.n_classes = 151
@@ -24,17 +25,20 @@ class MITSceneParsingLoader(data.Dataset):
     self.augmentations = augmentations
     self.is_transform = is_transform
     
-    self.images_path = os.path.join("data_loader/data/ADEChallengeData2016", "images", split)
-    self.annotations_path = os.path.join("data_loader/data/ADEChallengeData2016", "annotations", split)
+    self.images_path = os.path.join(self.package_path, "data/ADEChallengeData2016", "images", split)
+    self.annotations_path = os.path.join(self.package_path, "data/ADEChallengeData2016", "annotations", split)
 
     self.files = glob.glob(self.images_path + "/*.jpg")
     
-    # AH cut down to 512 files
-    #self.files = self.files[0:512]
-    
     if not self.files:
       raise Exception("No files for split=[%s] found in %s" % (split, self.images_path))
-      
+    
+    # TMP
+    if split == "training":
+      self.files = self.files[:1000]
+    if split == "validation":
+      self.files = self.files[:100]
+    
     print(f"Found {len(self.files)} {split} images")
 
     
@@ -54,18 +58,20 @@ class MITSceneParsingLoader(data.Dataset):
     
     ## Tranform annotations
     annt_orig_np = np.array(annt, dtype=np.uint8)
+    
     classes = np.unique(annt_orig_np)
-
+    
     annt = annt.resize(self.img_size, PIL.Image.NEAREST)
+    
     annt_down_np = np.array(annt, dtype=np.uint8)
 
     if not np.all(classes == np.unique(annt_down_np)):
-      print("WARN: resizing labels yielded fewer classes")
+      print(f"WARN: resizing labels yielded fewer classes: {classes} vs {np.unique(annt_down_np)}")
     if not np.all(np.unique(annt_down_np) < self.n_classes):
       raise ValueError("Segmentation map contained invalid class values")
 
     annt_t = torch.from_numpy(annt_down_np).long()
-
+    
     return img_t, annt_t
   
   

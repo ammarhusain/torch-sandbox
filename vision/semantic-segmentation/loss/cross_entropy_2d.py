@@ -1,9 +1,15 @@
 import torch.nn as nn
 
 class CrossEntropy2d(nn.Module):
-  def __init__(self, dim=1):
+  def __init__(self, dim=1, ignore_idx=-100, weight=None):
     super().__init__()
-    self.criterion = nn.NLLLoss()
+    print(f"********  weight: {weight}")
+
+    if weight is not None:
+      print(f"********  weight: {weight}")
+      self.criterion = nn.NLLLoss(weight=weight, ignore_index=ignore_idx)
+    else:
+      self.criterion = nn.NLLLoss(ignore_index=ignore_idx)
     self.softmax = nn.LogSoftmax(dim=1)
   def forward(self, input, target):
     return self.criterion(self.softmax(input), target)

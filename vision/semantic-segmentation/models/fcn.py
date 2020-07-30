@@ -77,7 +77,7 @@ class FCN32s(nn.Module):
     
     orig_W = x.size()[2:] 
     out = F.interpolate(input=score, size=orig_W)
-
+    
     return out
   
   def vgg16_init(vgg16):
