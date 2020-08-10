@@ -10,3 +10,4 @@ spacy
 ipykernel
 tensorboardX
 #pip install git+https://github.com/lucasb-eyer/pydensecrf.git
+torchvision

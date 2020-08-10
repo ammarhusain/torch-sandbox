@@ -11,13 +11,20 @@ class SimulatedDataLoader(data.Dataset):
       Generates random shapes
   """
   package_path = os.path.dirname(os.path.abspath(__file__))
-  def __init__(self, n_imgs = 500, img_size=(512,512), n_classes = 10):
+  def __init__(self, split="training", n_imgs = 2000, img_size=(512,512), n_classes = 10):
+    self.name = "simulated"
     self.n_classes = n_classes
     self.img_size = img_size
     self.n_imgs = n_imgs
+    if split == "validation":
+      self.n_imgs = 400
+      
     # some dummy image mean.
     self.img_mean = np.array([122.5, 122.5, 122.5])
-    
+  
+    # weight the background 10x less in the loss fn.
+    self.class_imbalance_weight = torch.tensor([1.0] +  9*[10.0]) 
+
     self.shapes = []
     for i in range(n_imgs):
       self.shapes.append([4*[SimulatedDataLoader.get_random_location(*self.img_size)]])

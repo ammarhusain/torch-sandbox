@@ -24,6 +24,7 @@ class MITSceneParsingLoader(data.Dataset):
     self.files = {}
     self.augmentations = augmentations
     self.is_transform = is_transform
+    self.name = "mit_sceneparsing"
     
     self.images_path = os.path.join(self.package_path, "data/ADEChallengeData2016", "images", split)
     self.annotations_path = os.path.join(self.package_path, "data/ADEChallengeData2016", "annotations", split)
@@ -32,12 +33,6 @@ class MITSceneParsingLoader(data.Dataset):
     
     if not self.files:
       raise Exception("No files for split=[%s] found in %s" % (split, self.images_path))
-    
-    # TMP
-    if split == "training":
-      self.files = self.files[:1000]
-    if split == "validation":
-      self.files = self.files[:100]
     
     print(f"Found {len(self.files)} {split} images")
 
