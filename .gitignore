@@ -4,7 +4,8 @@
 *~
 .ipynb_checkpoints
 nlp/bentrevett-tuts/models/
-vision/semantic-segmentation/data_loader/data/
+vision/data_loader/data/
 
 *.pkl
-vision/semantic-segmentation/results/
+vision/results/
+vision/checkpoints/
