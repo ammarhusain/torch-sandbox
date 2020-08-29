@@ -16,7 +16,7 @@ class Logger:
 
     def __init__(self, comment):
         self.comment = comment
-        self.log_dir = self.comment + "_logs"
+        self.log_dir = "checkpoints/" + self.comment + "_logs"
         # TensorBoard
         self.writer = SummaryWriter(logdir=self.log_dir)
 
@@ -38,6 +38,10 @@ class Logger:
       print(f'Epoch: [{epoch}/{num_epochs}], Batch Num: [{n_batch}/{num_batches}]')
       print(f'Discriminator Loss: {d_error:.4f}, Generator Loss: {g_error:.4f}')
       print(f'D(x): {d_pred_real.mean():.4f}, D(G(z)): {d_pred_fake.mean():.4f}')
+      
+    def display_classes (self, g_classes, d_pred_type, d_pred_classes):
+      class_pair = [(l1.item(), l3.item(), round(l2.item(), 3)) for l1, l2, l3 in zip(g_classes, d_pred_type, d_pred_classes)]
+      print(f'(Generator, Prediction, Real/Fake): {class_pair}')
       
     def log_images(self, images, epoch, n_batch, num_batches, format='NCHW', normalize=True):
         '''
