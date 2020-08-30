@@ -13,14 +13,13 @@ import torch
 
 
 class Logger:
-
-    def __init__(self, comment):
+    def __init__(self, comment, log_dir):
         self.comment = comment
-        self.log_dir = "checkpoints/" + self.comment + "_logs"
+        self.log_dir = log_dir
         # TensorBoard
         self.writer = SummaryWriter(logdir=self.log_dir)
 
-    def log_gan_error(self, d_error, g_error, epoch, n_batch, num_batches):
+    def log_gan_error(self, d_error, g_error, d_pred_real, d_pred_fake, epoch, n_batch, num_batches):
         d_error = d_error.data.cpu().numpy()
         g_error = g_error.data.cpu().numpy()
         step = Logger._step(epoch, n_batch, num_batches)
@@ -28,6 +27,10 @@ class Logger:
             f'{self.comment}/D_error', d_error, step)
         self.writer.add_scalar(
             f'{self.comment}/G_error', g_error, step)
+        self.writer.add_scalar(
+            f'{self.comment}/D(x)', d_pred_real.mean(), step)
+        self.writer.add_scalar(
+            f'{self.comment}/D(G(x))', d_pred_fake.mean(), step)
         
     def display_gan_status(self, d_error, g_error, d_pred_real, d_pred_fake, epoch, num_epochs, n_batch, num_batches):
       d_error = d_error.data.cpu().numpy()
@@ -79,7 +82,7 @@ class Logger:
         plt.axis('off')
         if plot_horizontal:
             display.display(plt.gcf())
-        self._save_images(fig, epoch, n_batch, 'hori')
+        ## self._save_images(fig, epoch, n_batch, 'hori')
         plt.close()
 
         # Save squared
