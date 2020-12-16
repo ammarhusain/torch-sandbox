@@ -219,47 +219,48 @@ class DCDiscriminatorNet(nn.Module):
   
   
 class DCGeneratorNet(nn.Module):
-  def __init__(self, noise_dim=100):
+  def __init__(self, noise_dim=100, filter_dim=512):
     super(DCGeneratorNet,self).__init__()
+    
     self.hidden_1 = nn.Sequential(
       nn.ConvTranspose2d(in_channels=noise_dim,
-                        out_channels=512,
+                        out_channels=filter_dim,
                         kernel_size=4, stride=1, 
                         padding=0, bias=False),
-      nn.BatchNorm2d(512),
+      nn.BatchNorm2d(filter_dim),
       nn.ReLU(True)
-    ) # [batch_sz, 512, 4, 4]
+    ) # [batch_sz, filter_dim, 4, 4]
     self.hidden_2 = nn.Sequential(
-      nn.ConvTranspose2d(in_channels=512,
-                        out_channels=256,
+      nn.ConvTranspose2d(in_channels=filter_dim,
+                        out_channels=int(filter_dim/2),
                         kernel_size=4, stride=2, 
                         padding=1, bias=False),
-      nn.BatchNorm2d(256),
+      nn.BatchNorm2d(int(filter_dim/2)),
       nn.ReLU(True)
-    ) # [batch_sz, 256, 8, 8]
+    ) # [batch_sz, filter_dim/2, 8, 8]
     self.hidden_3 = nn.Sequential(
-      nn.ConvTranspose2d(in_channels=256,
-                        out_channels=128,
+      nn.ConvTranspose2d(in_channels=int(filter_dim/2),
+                        out_channels=int(filter_dim/4),
                         kernel_size=4, stride=2, 
                         padding=1, bias=False),
-      nn.BatchNorm2d(128),
+      nn.BatchNorm2d(int(filter_dim/4)),
       nn.ReLU(True)
-    ) # [batch_sz, 128, 16, 16]
+    ) # [batch_sz, filter_dim/4, 16, 16]
     self.hidden_4 = nn.Sequential(
-      nn.ConvTranspose2d(in_channels=128,
-                        out_channels=64,
+      nn.ConvTranspose2d(in_channels=int(filter_dim/4),
+                        out_channels=int(filter_dim/8),
                         kernel_size=4, stride=2, 
                         padding=1, bias=False),
-      nn.BatchNorm2d(64),
+      nn.BatchNorm2d(int(filter_dim/8)),
       nn.ReLU(True)
-    ) # [batch_sz, 64, 32, 32]
+    ) # [batch_sz, filter_dim/8, 32, 32]
     self.out = nn.Sequential(
-      nn.ConvTranspose2d(in_channels=64,
+      nn.ConvTranspose2d(in_channels=int(filter_dim/8),
                         out_channels=3,
                         kernel_size=4, stride=2, 
                         padding=1, bias=False),
       nn.Tanh()
-    ) # [batch_sz, 32, 64, 64]
+    ) # [batch_sz, 3, 64, 64]
     
     self.apply(weights_init)
     
